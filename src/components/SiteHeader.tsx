@@ -7,20 +7,26 @@ interface SiteHeaderProps {
   siteDescription?: string
 }
 
-export function SiteHeader({ siteName = 'Nexus News', siteDescription }: SiteHeaderProps) {
+export function SiteHeader({ siteName = 'NEWSLETTER', siteDescription }: SiteHeaderProps) {
   return (
     <header className="site-header">
-      <div className="container">
-        <div className="header-content">
-          <div className="site-branding">
-            <h1 className="site-title">{siteName}</h1>
-            {siteDescription && (
-              <p className="site-description">{siteDescription}</p>
-            )}
+      <div className="header-content">
+        <div className="site-branding">
+          <h1 className="site-title">{siteName}</h1>
+          {siteDescription && (
+            <p className="site-description">{siteDescription}</p>
+          )}
+        </div>
+        <div className="header-actions">
+          <div className="search-box">
+            <input 
+              type="text" 
+              placeholder="Search articles..." 
+              className="search-input"
+            />
+            <button className="search-button">SEARCH</button>
           </div>
-          <div className="header-actions">
-            <ThemeToggle />
-          </div>
+          <ThemeToggle />
         </div>
       </div>
     </header>

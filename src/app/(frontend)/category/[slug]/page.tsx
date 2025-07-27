@@ -2,10 +2,12 @@ import Link from 'next/link'
 import { getPayload } from 'payload'
 import { notFound } from 'next/navigation'
 import React from 'react'
+import { SiteHeader } from '@/components/SiteHeader'
+import { RichTextRenderer } from '@/components/RichTextRenderer'
 
 import config from '@/payload.config'
 
-// ISR - Her 180 saniyede bir yeniden oluştur (3 dakika)
+// ISR - Revalidate every 3 minutes
 export const revalidate = 180
 
 interface CategoryPageProps {
@@ -19,7 +21,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   const payloadConfig = await config
   const payload = await getPayload({ config: payloadConfig })
 
-  // Kategoriyi slug ile bul
+  // Find category by slug
   const { docs: categories } = await payload.find({
     collection: 'categories',
     where: {
@@ -36,7 +38,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
     notFound()
   }
 
-  // Bu kategoriye ait yazıları bul
+  // Find posts for this category
   const { docs: posts } = await payload.find({
     collection: 'posts',
     where: {
@@ -51,77 +53,144 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
     limit: 20,
   })
 
-  // Site ayarlarını al
+  // Get site settings
   const siteSettings = await payload.findGlobal({
     slug: 'site-settings',
   })
 
-  return (
-    <div className="category-page">
-      <header className="site-header">
-        <div className="container">
-          <Link href="/" className="site-title">
-            {siteSettings?.siteName || 'Nexus News'}
-          </Link>
-        </div>
-      </header>
+  // Get categories for navigation
+  const { docs: allCategories } = await payload.find({
+    collection: 'categories',
+    limit: 6,
+    sort: 'name',
+  })
 
-      <main className="main-content">
-        <div className="container">
-          <div className="page-header">
+  // Separate featured post and regular posts
+  const featuredPost = posts[0]
+  const regularPosts = posts.slice(1)
+
+  return (
+    <div className="newsletter-layout">
+      <SiteHeader 
+        siteName={siteSettings?.siteName || 'NEWSLETTER'}
+        siteDescription={siteSettings?.siteDescription}
+      />
+
+      <main className="main-container">
+        <div className="content-wrapper">
+          {/* Navigation Bar */}
+          <nav className="main-navigation">
+            <ul className="nav-menu">
+              <li><Link href="/" className="nav-item">All News</Link></li>
+              {allCategories.map((cat: any) => (
+                <li key={cat.id}>
+                  <Link 
+                    href={`/category/${cat.slug}`} 
+                    className={`nav-item ${cat.slug === category.slug ? 'active' : ''}`}
+                  >
+                    {cat.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          {/* Category Header */}
+          <section className="category-header">
             <div className="breadcrumb">
-              <Link href="/">Ana Sayfa</Link>
+              <Link href="/">Home</Link>
               <span> / </span>
-              <span>Kategori</span>
+              <span>Category</span>
               <span> / </span>
               <span>{category.name}</span>
             </div>
             
-            <h1 className="page-title">
-              Kategori: {category.name}
-            </h1>
+            <h1 className="category-title">{category.name}</h1>
             
             {category.description && (
               <p className="category-description">{category.description}</p>
             )}
-          </div>
-
-          <section className="category-posts">
-            <div className="posts-count">
-              <p>{posts.length} haber bulundu</p>
-            </div>
             
-            <div className="posts-grid">
-              {posts.map((post: any) => (
-                <article key={post.id} className="post-card">
-                  <div className="post-content">
-                    <div className="post-meta">
-                      <span className="date">
-                        {new Date(post.publishedDate || post.createdAt).toLocaleDateString('tr-TR')}
-                      </span>
-                    </div>
-                    <h3 className="post-title">
-                      <Link href={`/posts/${post.slug}`}>
-                        {post.title}
-                      </Link>
-                    </h3>
-                    {post.excerpt && (
-                      <p className="post-excerpt">{post.excerpt}</p>
-                    )}
-                  </div>
-                </article>
-              ))}
+            <div className="posts-count">
+              <span>{posts.length} articles found</span>
             </div>
+          </section>
 
-            {posts.length === 0 && (
-              <div className="no-posts">
-                <p>Bu kategoride henüz haber bulunmuyor.</p>
+          {/* Featured Post for Category */}
+          {featuredPost && (
+            <section className="category-featured">
+              <div className="featured-card">
+                <div className="featured-content">
+                  <div className="featured-meta">
+                    <span className="featured-category">{category.name}</span>
+                    <span className="featured-date">
+                      {new Date(featuredPost.publishedDate || featuredPost.createdAt).toLocaleDateString('en-US', {
+                        month: 'long',
+                        day: 'numeric',
+                        year: 'numeric'
+                      })}
+                    </span>
+                  </div>
+                  <h2 className="featured-title">
+                    <Link href={`/posts/${featuredPost.slug}`}>
+                      {featuredPost.title}
+                    </Link>
+                  </h2>
+                  {featuredPost.excerpt && (
+                    <p className="featured-excerpt">{featuredPost.excerpt}</p>
+                  )}
+                  <Link href={`/posts/${featuredPost.slug}`} className="read-more">
+                    Read Full Article →
+                  </Link>
+                </div>
+              </div>
+            </section>
+          )}
+
+          {/* Regular Posts Grid */}
+          {regularPosts.length > 0 && (
+            <section className="category-posts">
+              <h3 className="section-title">More from {category.name}</h3>
+              <div className="news-grid">
+                {regularPosts.map((post: any) => (
+                  <article key={post.id} className="news-card">
+                    <div className="card-content">
+                      <div className="card-meta">
+                        <span className="card-category">{category.name}</span>
+                        <span className="card-date">
+                          {new Date(post.publishedDate || post.createdAt).toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric'
+                          })}
+                        </span>
+                      </div>
+                      <h4 className="card-title">
+                        <Link href={`/posts/${post.slug}`}>
+                          {post.title}
+                        </Link>
+                      </h4>
+                      {post.excerpt && (
+                        <p className="card-excerpt">{post.excerpt}</p>
+                      )}
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* No Posts Message */}
+          {posts.length === 0 && (
+            <section className="no-posts">
+              <div className="empty-state">
+                <h3>No articles in this category yet</h3>
+                <p>Check back later for new content.</p>
                 <Link href="/" className="back-link">
-                  Ana Sayfaya Dön
+                  ← Back to Homepage
                 </Link>
               </div>
-            )}
-          </section>
+            </section>
+          )}
         </div>
       </main>
     </div>

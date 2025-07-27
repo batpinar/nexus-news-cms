@@ -1,14 +1,13 @@
-import { GetStaticProps, GetStaticPaths } from 'next'
 import Link from 'next/link'
-import Image from 'next/image'
 import { getPayload } from 'payload'
 import { notFound } from 'next/navigation'
 import React from 'react'
 import { RichTextRenderer } from '@/components/RichTextRenderer'
+import { SiteHeader } from '@/components/SiteHeader'
 
 import config from '@/payload.config'
 
-// ISR - Her 300 saniyede bir yeniden oluştur (5 dakika)
+// ISR - Revalidate every 5 minutes
 export const revalidate = 300
 
 interface PostPageProps {
@@ -22,7 +21,7 @@ export default async function PostPage({ params }: PostPageProps) {
   const payloadConfig = await config
   const payload = await getPayload({ config: payloadConfig })
 
-  // Yazıyı slug ile bul
+  // Find post by slug
   const { docs: posts } = await payload.find({
     collection: 'posts',
     where: {
@@ -42,42 +41,39 @@ export default async function PostPage({ params }: PostPageProps) {
     notFound()
   }
 
-  // Site ayarlarını al (meta bilgiler için)
+  // Get site settings for meta information
   const siteSettings = await payload.findGlobal({
     slug: 'site-settings',
   })
 
   return (
-    <div className="post-page">
-      <header className="site-header">
-        <div className="container">
-          <Link href="/" className="site-title">
-            {siteSettings?.siteName || 'Nexus News'}
-          </Link>
-        </div>
-      </header>
+    <div className="newsletter-layout">
+      <SiteHeader 
+        siteName={siteSettings?.siteName || 'NEWSLETTER'}
+        siteDescription={siteSettings?.siteDescription}
+      />
 
-      <main className="main-content">
-        <div className="container">
+      <main className="main-container">
+        <div className="content-wrapper">
           <article className="post-article">
             <header className="post-header">
               <div className="breadcrumb">
-                <Link href="/">Ana Sayfa</Link>
+                <Link href="/">Home</Link>
                 <span> / </span>
-                <span>Haber</span>
+                <span>Article</span>
               </div>
               
               <h1 className="post-title">{post.title}</h1>
               
               <div className="post-meta">
                 <div className="meta-info">
+                  <span className="author">By News Team</span>
+                  <span className="separator">•</span>
                   <span className="date">
-                    {new Date(post.publishedDate || post.createdAt).toLocaleDateString('tr-TR', {
+                    {new Date(post.publishedDate || post.createdAt).toLocaleDateString('en-US', {
                       year: 'numeric',
                       month: 'long',
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit'
+                      day: 'numeric'
                     })}
                   </span>
                 </div>
@@ -91,38 +87,24 @@ export default async function PostPage({ params }: PostPageProps) {
             </header>
 
             <div className="post-content">
-              {/* Payload'ın rich text içeriğini render et */}
               <RichTextRenderer content={post.content} />
             </div>
 
             <footer className="post-footer">
-              {post.tags && post.tags.length > 0 && (
-                <div className="post-tags">
-                  <h4>Etiketler:</h4>
-                  <div className="tags-list">
-                    {post.tags.map((tag: string, index: number) => (
-                      <span key={index} className="tag">
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
+              <div className="back-to-home">
+                <Link href="/" className="back-link">
+                  ← Back to Homepage
+                </Link>
+              </div>
             </footer>
           </article>
-
-          <div className="post-navigation">
-            <Link href="/" className="back-link">
-              ← Ana Sayfaya Dön
-            </Link>
-          </div>
         </div>
       </main>
     </div>
   )
 }
 
-// Static paths için gerekli function
+// Generate static paths for ISR
 export async function generateStaticParams() {
   const payloadConfig = await config
   const payload = await getPayload({ config: payloadConfig })
