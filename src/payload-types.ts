@@ -69,6 +69,9 @@ export interface Config {
   collections: {
     users: User;
     media: Media;
+    posts: Post;
+    categories: Category;
+    authors: Author;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -77,6 +80,9 @@ export interface Config {
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    posts: PostsSelect<false> | PostsSelect<true>;
+    categories: CategoriesSelect<false> | CategoriesSelect<true>;
+    authors: AuthorsSelect<false> | AuthorsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -84,8 +90,12 @@ export interface Config {
   db: {
     defaultIDType: string;
   };
-  globals: {};
-  globalsSelect: {};
+  globals: {
+    'site-settings': SiteSetting;
+  };
+  globalsSelect: {
+    'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
+  };
   locale: null;
   user: User & {
     collection: 'users';
@@ -158,6 +168,115 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "posts".
+ */
+export interface Post {
+  id: string;
+  title: string;
+  /**
+   * URL-friendly versiyon (örn: haberimin-basligi)
+   */
+  slug: string;
+  author: string | Author;
+  category: string | Category;
+  content: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * Kısa açıklama/özet (liste sayfalarında gösterilir)
+   */
+  excerpt?: string | null;
+  featuredImage?: (string | null) | Media;
+  status?: ('draft' | 'published' | 'archived') | null;
+  publishedDate?: string | null;
+  /**
+   * Virgülle ayırarak etiket ekleyin
+   */
+  tags?: string[] | null;
+  meta?: {
+    /**
+     * Arama motorları için özel başlık (boşsa normal başlık kullanılır)
+     */
+    title?: string | null;
+    /**
+     * Arama sonuçlarında gösterilecek açıklama (max 160 karakter)
+     */
+    description?: string | null;
+    /**
+     * Virgülle ayırarak anahtar kelimeler ekleyin
+     */
+    keywords?: string | null;
+    /**
+     * Facebook, Twitter vb. paylaşımlar için görsel
+     */
+    ogImage?: (string | null) | Media;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "authors".
+ */
+export interface Author {
+  id: string;
+  name: string;
+  email: string;
+  avatar?: (string | null) | Media;
+  /**
+   * Yazar hakkında kısa bilgi
+   */
+  bio?: string | null;
+  role?: ('writer' | 'editor' | 'reporter' | 'columnist') | null;
+  socialMedia?: {
+    twitter?: string | null;
+    linkedin?: string | null;
+    website?: string | null;
+  };
+  /**
+   * Yazarın aktif olup olmadığını belirtir
+   */
+  isActive?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories".
+ */
+export interface Category {
+  id: string;
+  name: string;
+  /**
+   * URL-friendly versiyon (örn: teknoloji)
+   */
+  slug: string;
+  /**
+   * Kategori hakkında kısa açıklama
+   */
+  description?: string | null;
+  /**
+   * Kategori rengi (hex kod: #FF5733)
+   */
+  color?: string | null;
+  image?: (string | null) | Media;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
@@ -170,6 +289,18 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'media';
         value: string | Media;
+      } | null)
+    | ({
+        relationTo: 'posts';
+        value: string | Post;
+      } | null)
+    | ({
+        relationTo: 'categories';
+        value: string | Category;
+      } | null)
+    | ({
+        relationTo: 'authors';
+        value: string | Author;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -255,6 +386,66 @@ export interface MediaSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "posts_select".
+ */
+export interface PostsSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  author?: T;
+  category?: T;
+  content?: T;
+  excerpt?: T;
+  featuredImage?: T;
+  status?: T;
+  publishedDate?: T;
+  tags?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        keywords?: T;
+        ogImage?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories_select".
+ */
+export interface CategoriesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  description?: T;
+  color?: T;
+  image?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "authors_select".
+ */
+export interface AuthorsSelect<T extends boolean = true> {
+  name?: T;
+  email?: T;
+  avatar?: T;
+  bio?: T;
+  role?: T;
+  socialMedia?:
+    | T
+    | {
+        twitter?: T;
+        linkedin?: T;
+        website?: T;
+      };
+  isActive?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents_select".
  */
 export interface PayloadLockedDocumentsSelect<T extends boolean = true> {
@@ -284,6 +475,119 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings".
+ */
+export interface SiteSetting {
+  id: string;
+  siteName: string;
+  siteDescription: string;
+  /**
+   * Site'nin ana URL'si (örn: https://nexusnews.com)
+   */
+  siteUrl: string;
+  logo?: (string | null) | Media;
+  favicon?: (string | null) | Media;
+  theme?: {
+    /**
+     * Ana tema rengi (hex kod)
+     */
+    primaryColor?: string | null;
+    /**
+     * İkincil tema rengi (hex kod)
+     */
+    secondaryColor?: string | null;
+    /**
+     * Vurgu rengi (hex kod)
+     */
+    accentColor?: string | null;
+  };
+  socialMedia?: {
+    facebook?: string | null;
+    twitter?: string | null;
+    instagram?: string | null;
+    youtube?: string | null;
+    linkedin?: string | null;
+  };
+  contact?: {
+    email?: string | null;
+    phone?: string | null;
+    address?: string | null;
+  };
+  seo?: {
+    /**
+     * Arama motorları için ana sayfa başlığı
+     */
+    metaTitle?: string | null;
+    /**
+     * Arama sonuçlarında gösterilecek açıklama
+     */
+    metaDescription?: string | null;
+    /**
+     * Sosyal medya paylaşımları için varsayılan görsel
+     */
+    ogImage?: (string | null) | Media;
+  };
+  dailyQuote?: {
+    enabled?: boolean | null;
+    quote?: string | null;
+    author?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings_select".
+ */
+export interface SiteSettingsSelect<T extends boolean = true> {
+  siteName?: T;
+  siteDescription?: T;
+  siteUrl?: T;
+  logo?: T;
+  favicon?: T;
+  theme?:
+    | T
+    | {
+        primaryColor?: T;
+        secondaryColor?: T;
+        accentColor?: T;
+      };
+  socialMedia?:
+    | T
+    | {
+        facebook?: T;
+        twitter?: T;
+        instagram?: T;
+        youtube?: T;
+        linkedin?: T;
+      };
+  contact?:
+    | T
+    | {
+        email?: T;
+        phone?: T;
+        address?: T;
+      };
+  seo?:
+    | T
+    | {
+        metaTitle?: T;
+        metaDescription?: T;
+        ogImage?: T;
+      };
+  dailyQuote?:
+    | T
+    | {
+        enabled?: T;
+        quote?: T;
+        author?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
