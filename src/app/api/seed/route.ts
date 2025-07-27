@@ -16,16 +16,16 @@ const categories = [
 ]
 
 const authors = [
-  { name: 'Ahmet Yılmaz', email: 'ahmet.yilmaz@nexusnews.com', bio: 'Teknoloji editörü. 10 yıllık deneyim.', role: 'editor' },
-  { name: 'Fatma Demir', email: 'fatma.demir@nexusnews.com', bio: 'Spor muhabiri ve analisti.', role: 'reporter' },
-  { name: 'Mehmet Kaya', email: 'mehmet.kaya@nexusnews.com', bio: 'Siyaset köşe yazarı.', role: 'columnist' },
-  { name: 'Ayşe Çelik', email: 'ayse.celik@nexusnews.com', bio: 'Ekonomi editörü ve analisti.', role: 'editor' },
-  { name: 'Murat Özkan', email: 'murat.ozkan@nexusnews.com', bio: 'Kültür ve sanat yazarı.', role: 'writer' },
-  { name: 'Zeynep Arslan', email: 'zeynep.arslan@nexusnews.com', bio: 'Sağlık muhabiri.', role: 'reporter' },
-  { name: 'Emre Doğan', email: 'emre.dogan@nexusnews.com', bio: 'Eğitim editörü.', role: 'editor' },
-  { name: 'Selin Yurtsever', email: 'selin.yurtsever@nexusnews.com', bio: 'Çevre muhabiri.', role: 'reporter' },
-  { name: 'Burak Şahin', email: 'burak.sahin@nexusnews.com', bio: 'Bilim yazarı ve araştırmacı.', role: 'writer' },
-  { name: 'Deniz Aktaş', email: 'deniz.aktas@nexusnews.com', bio: 'Uluslararası muhabir.', role: 'reporter' }
+  { name: 'Ahmet Yılmaz', email: 'ahmet.yilmaz@nexusnews.com', bio: 'Teknoloji editörü. 10 yıllık deneyim.', role: 'editor' as const },
+  { name: 'Fatma Demir', email: 'fatma.demir@nexusnews.com', bio: 'Spor muhabiri ve analisti.', role: 'reporter' as const },
+  { name: 'Mehmet Kaya', email: 'mehmet.kaya@nexusnews.com', bio: 'Siyaset köşe yazarı.', role: 'columnist' as const },
+  { name: 'Ayşe Çelik', email: 'ayse.celik@nexusnews.com', bio: 'Ekonomi editörü ve analisti.', role: 'editor' as const },
+  { name: 'Murat Özkan', email: 'murat.ozkan@nexusnews.com', bio: 'Kültür ve sanat yazarı.', role: 'writer' as const },
+  { name: 'Zeynep Arslan', email: 'zeynep.arslan@nexusnews.com', bio: 'Sağlık muhabiri.', role: 'reporter' as const },
+  { name: 'Emre Doğan', email: 'emre.dogan@nexusnews.com', bio: 'Eğitim editörü.', role: 'editor' as const },
+  { name: 'Selin Yurtsever', email: 'selin.yurtsever@nexusnews.com', bio: 'Çevre muhabiri.', role: 'reporter' as const },
+  { name: 'Burak Şahin', email: 'burak.sahin@nexusnews.com', bio: 'Bilim yazarı ve araştırmacı.', role: 'writer' as const },
+  { name: 'Deniz Aktaş', email: 'deniz.aktas@nexusnews.com', bio: 'Uluslararası muhabir.', role: 'reporter' as const }
 ]
 
 export async function POST(request: NextRequest) {

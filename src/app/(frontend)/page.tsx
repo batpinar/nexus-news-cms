@@ -1,9 +1,14 @@
 import Link from 'next/link'
 import { getPayload } from 'payload'
 import React from 'react'
+import { SiteHeader } from '@/components/SiteHeader'
+import { DailyQuote } from '@/components/DailyQuote'
 
 import config from '@/payload.config'
 import './styles.css'
+
+// ISR - Her 60 saniyede bir yeniden oluştur (updated)
+export const revalidate = 60
 
 export default async function HomePage() {
   const payloadConfig = await config
@@ -28,25 +33,24 @@ export default async function HomePage() {
 
   return (
     <div className="home">
-      <header className="site-header">
-        <div className="container">
-          <div className="site-branding">
-            <h1 className="site-title">{siteSettings?.siteName || 'Nexus News'}</h1>
-            <p className="site-description">{siteSettings?.siteDescription}</p>
-          </div>
-        </div>
-      </header>
+      <SiteHeader 
+        siteName={siteSettings?.siteName || 'Nexus News'}
+        siteDescription={siteSettings?.siteDescription}
+      />
 
       <main className="main-content">
         <div className="container">
           {/* Günün Sözü */}
+          <DailyQuote />
+
+          {/* Günün Sözü - Site Settings */}
           {siteSettings?.dailyQuote?.enabled && siteSettings.dailyQuote.quote && (
             <section className="daily-quote">
-              <h2>Günün Sözü</h2>
+              <h2>Günün Sözü (Site Ayarları)</h2>
               <blockquote>
-                <p>"{siteSettings.dailyQuote.quote}"</p>
+                <p className="quote-text">"{siteSettings.dailyQuote.quote}"</p>
                 {siteSettings.dailyQuote.author && (
-                  <cite>— {siteSettings.dailyQuote.author}</cite>
+                  <cite className="quote-author">— {siteSettings.dailyQuote.author}</cite>
                 )}
               </blockquote>
             </section>

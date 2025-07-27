@@ -4,8 +4,12 @@ import Image from 'next/image'
 import { getPayload } from 'payload'
 import { notFound } from 'next/navigation'
 import React from 'react'
+import { RichTextRenderer } from '@/components/RichTextRenderer'
 
 import config from '@/payload.config'
+
+// ISR - Her 300 saniyede bir yeniden oluştur (5 dakika)
+export const revalidate = 300
 
 interface PostPageProps {
   params: {
@@ -14,7 +18,7 @@ interface PostPageProps {
 }
 
 export default async function PostPage({ params }: PostPageProps) {
-  const { slug } = params
+  const { slug } = await params
   const payloadConfig = await config
   const payload = await getPayload({ config: payloadConfig })
 
@@ -88,7 +92,7 @@ export default async function PostPage({ params }: PostPageProps) {
 
             <div className="post-content">
               {/* Payload'ın rich text içeriğini render et */}
-              <div dangerouslySetInnerHTML={{ __html: JSON.stringify(post.content) }} />
+              <RichTextRenderer content={post.content} />
             </div>
 
             <footer className="post-footer">

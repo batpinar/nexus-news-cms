@@ -5,6 +5,9 @@ import React from 'react'
 
 import config from '@/payload.config'
 
+// ISR - Her 180 saniyede bir yeniden oluştur (3 dakika)
+export const revalidate = 180
+
 interface CategoryPageProps {
   params: {
     slug: string
@@ -12,7 +15,7 @@ interface CategoryPageProps {
 }
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
-  const { slug } = params
+  const { slug } = await params
   const payloadConfig = await config
   const payload = await getPayload({ config: payloadConfig })
 
