@@ -29,6 +29,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
         equals: slug,
       },
     },
+    depth: 2,
     limit: 1,
   })
 
@@ -96,7 +97,14 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
           </nav>
 
           {/* Category Header */}
-          <section className="category-header">
+          <section className="category-header" style={{
+            backgroundImage: (category.image && typeof category.image === 'object' && category.image.url)
+              ? `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7)), url(${category.image.url})` 
+              : 'linear-gradient(135deg, var(--orange-500), var(--orange-600))',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
+          }}>
             <div className="breadcrumb">
               <Link href="/">Home</Link>
               <span> / </span>
@@ -154,6 +162,27 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
               <div className="news-grid">
                 {regularPosts.map((post: any) => (
                   <article key={post.id} className="news-card">
+                    <div className="news-image">
+                      {post.featuredImage && typeof post.featuredImage === 'object' && post.featuredImage.url ? (
+                        <img
+                          src={post.featuredImage.url}
+                          alt={post.featuredImage.alt || post.title}
+                        />
+                      ) : (
+                        <div style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          width: '100%',
+                          height: '100%',
+                          background: 'linear-gradient(135deg, var(--orange-500), var(--orange-600))',
+                          color: 'rgba(255, 255, 255, 0.7)',
+                          fontSize: '3rem'
+                        }}>
+                          📰
+                        </div>
+                      )}
+                    </div>
                     <div className="card-content">
                       <div className="card-meta">
                         <span className="card-category">{category.name}</span>

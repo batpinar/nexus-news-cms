@@ -75,14 +75,27 @@ export default async function HomePage() {
                 <div className="news-grid">
                   {posts.slice(1, 7).map((post: any) => (
                     <article key={post.id} className="news-card">
-                      {post.featuredImage && typeof post.featuredImage === 'object' && (
-                        <div className="news-image">
+                      <div className="news-image">
+                        {post.featuredImage && typeof post.featuredImage === 'object' && post.featuredImage.url ? (
                           <img
-                            src={post.featuredImage.url || ''}
+                            src={post.featuredImage.url}
                             alt={post.featuredImage.alt || post.title}
                           />
-                        </div>
-                      )}
+                        ) : (
+                          <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: '100%',
+                            height: '100%',
+                            background: 'linear-gradient(135deg, var(--orange-500), var(--orange-600))',
+                            color: 'rgba(255, 255, 255, 0.7)',
+                            fontSize: '3rem'
+                          }}>
+                            📰
+                          </div>
+                        )}
+                      </div>
                       <div className="news-content">
                         <div className="news-meta">
                           {post.category && typeof post.category === 'object' && (
@@ -124,11 +137,24 @@ export default async function HomePage() {
                   {posts.slice(0, 6).map((post: any, index: number) => (
                     <article key={post.id} className="trending-item">
                       <div className="trending-image">
-                        {post.featuredImage && typeof post.featuredImage === 'object' && (
+                        {post.featuredImage && typeof post.featuredImage === 'object' && post.featuredImage.url ? (
                           <img
-                            src={post.featuredImage.url || ''}
+                            src={post.featuredImage.url}
                             alt={post.featuredImage.alt || post.title}
                           />
+                        ) : (
+                          <div style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            width: '100%',
+                            height: '100%',
+                            background: 'linear-gradient(135deg, var(--orange-500), var(--orange-600))',
+                            color: 'rgba(255, 255, 255, 0.7)',
+                            fontSize: '1.5rem'
+                          }}>
+                            📰
+                          </div>
                         )}
                       </div>
                       <div className="trending-content">
