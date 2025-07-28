@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 import React from 'react'
 import { SiteHeader } from '@/components/SiteHeader'
 import { RichTextRenderer } from '@/components/RichTextRenderer'
+import { ScrollableFeaturedContent } from '@/components/ScrollableFeaturedContent'
 
 import config from '@/payload.config'
 
@@ -126,33 +127,10 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 
           {/* Featured Post for Category */}
           {featuredPost && (
-            <section className="category-featured">
-              <div className="featured-card">
-                <div className="featured-content">
-                  <div className="featured-meta">
-                    <span className="featured-category">{category.name}</span>
-                    <span className="featured-date">
-                      {new Date(featuredPost.publishedDate || featuredPost.createdAt).toLocaleDateString('en-US', {
-                        month: 'long',
-                        day: 'numeric',
-                        year: 'numeric'
-                      })}
-                    </span>
-                  </div>
-                  <h2 className="featured-title">
-                    <Link href={`/posts/${featuredPost.slug}`}>
-                      {featuredPost.title}
-                    </Link>
-                  </h2>
-                  {featuredPost.excerpt && (
-                    <p className="featured-excerpt">{featuredPost.excerpt}</p>
-                  )}
-                  <Link href={`/posts/${featuredPost.slug}`} className="read-more">
-                    Read Full Article →
-                  </Link>
-                </div>
-              </div>
-            </section>
+            <ScrollableFeaturedContent 
+              featuredPost={featuredPost} 
+              category={category}
+            />
           )}
 
           {/* Regular Posts Grid */}
